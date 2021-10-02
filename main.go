@@ -22,6 +22,7 @@ var (
 	caseSensitive = flag.Bool("caseSensitive", true, "when true, case of wallet string must match 'start'. defaults to true")
 	concurrency   = flag.Int("concurrency", runtime.NumCPU(), "number of goroutines to use. defaults to number of cpus")
 	numResults    = flag.Int("numResults", 1, "number of results to wait for. defaults to 1")
+	singleLine    = flag.Bool("singleLine", false, "when true, address then private key are output on a single line separated by a space. defaults to false")
 	verbosity     = flag.Int("verbosity", 0, "verbosity of output. 0=results only, 1=also output start message, 2=also output settings")
 )
 
@@ -74,6 +75,7 @@ func main() {
 		fmt.Printf("  concurrency:     %v\n", *concurrency)
 		fmt.Printf("  numResults:      %v\n", *numResults)
 		fmt.Printf("  verbosity:       %v\n", *verbosity)
+		fmt.Printf("  singleLine:      %v\n", *singleLine)
 		fmt.Printf("\n")
 	}
 
@@ -90,12 +92,17 @@ func main() {
 	for i := 0; i < *numResults; i++ {
 		res := <-foundPair
 
-		fmt.Printf("Private Key:           %s\n", res.privateKey)
-		fmt.Printf("Address:               %s\n", res.address)
+		if *singleLine {
+			fmt.Printf("%s %s\n", res.address, res.privateKey)
+		} else {
+			fmt.Printf("Address:               %s\n", res.address)
+			fmt.Printf("Private Key:           %s\n", res.privateKey)
 
-		if *numResults > 1 {
-			fmt.Printf("\n")
+			if *numResults > 1 {
+				fmt.Printf("\n")
+			}
 		}
+
 	}
 
 }
