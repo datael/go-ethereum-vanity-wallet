@@ -22,6 +22,7 @@ var (
 	caseSensitive = flag.Bool("caseSensitive", true, "when true, case of wallet string must match 'start'. defaults to true")
 	concurrency   = flag.Int("concurrency", runtime.NumCPU(), "number of goroutines to use. defaults to number of cpus")
 	numResults    = flag.Int("numResults", 1, "number of results to wait for. defaults to 1")
+	verbosity     = flag.Int("verbosity", 0, "verbosity of output. 0=results only, 1=also output start message, 2=also output settings")
 )
 
 func generatePair() *pair {
@@ -62,7 +63,19 @@ func main() {
 		*start = ""
 	}
 
-	fmt.Printf("Looking for ETH wallet with address starting '0x%v'\n\n", *start)
+	if *verbosity >= 1 {
+		fmt.Printf("Looking for ETH wallet with address starting '0x%v'\n", *start)
+		fmt.Printf("\n")
+	}
+	if *verbosity >= 2 {
+		fmt.Printf("Settings:\n")
+		fmt.Printf("  start:           %v\n", *start)
+		fmt.Printf("  caseSensitive:   %v\n", *caseSensitive)
+		fmt.Printf("  concurrency:     %v\n", *concurrency)
+		fmt.Printf("  numResults:      %v\n", *numResults)
+		fmt.Printf("  verbosity:       %v\n", *verbosity)
+		fmt.Printf("\n")
+	}
 
 	foundPair := make(chan pair)
 
@@ -77,9 +90,12 @@ func main() {
 	for i := 0; i < *numResults; i++ {
 		res := <-foundPair
 
-		fmt.Printf("\n")
 		fmt.Printf("Private Key:           %s\n", res.privateKey)
 		fmt.Printf("Address:               %s\n", res.address)
+
+		if *numResults > 1 {
+			fmt.Printf("\n")
+		}
 	}
 
 }
