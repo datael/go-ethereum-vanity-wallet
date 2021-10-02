@@ -24,21 +24,19 @@ jobs:
       env:
         CGO_ENABLED: 0
       run: |
-        GOOS=linux GOARCH=amd64     go build -v -o ${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH} .
-        GOOS=linux GOARCH=arm       go build -v -o ${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH} .
-        GOOS=linux GOARCH=arm64     go build -v -o ${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH} .
-
-        GOOS=windows GOARCH=amd64   go build -v -o ${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH}.exe .
-        GOOS=windows GOARCH=arm     go build -v -o ${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH}.exe .
-        GOOS=windows GOARCH=arm64   go build -v -o ${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH}.exe .
+        GOOS=linux GOARCH=amd64     go build -v -o bin/${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH} . && \
+        GOOS=linux GOARCH=arm       go build -v -o bin/${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH} . && \
+        GOOS=linux GOARCH=arm64     go build -v -o bin/${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH} . && \
+        GOOS=windows GOARCH=amd64   go build -v -o bin/${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH}.exe . && \
+        GOOS=windows GOARCH=arm     go build -v -o bin/${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH}.exe . && \
+        GOOS=windows GOARCH=arm64   go build -v -o bin/${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH}.exe .
 
     - name: Release
       uses: marvinpinto/action-automatic-releases@latest
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        automatic_release_tag: latest
         prerelease: true
-        title: "Development Build"
         files: |
           LICENSE.md
-          ${EXECUTABLE_PREFIX}*
+          bin/*
