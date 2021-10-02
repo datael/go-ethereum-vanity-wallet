@@ -8,7 +8,13 @@ on:
 
 jobs:
 
-  build:
+  publish:
+    env:
+      EXECUTABLE_PREFIX: ethereum-vanity-wallet
+    strategy:
+      matrix:
+        os: [linux, windows]
+        arch: [amd64, arm, arm64]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -19,7 +25,22 @@ jobs:
         go-version: 1.17
 
     - name: Build
-      run: go build -v ./...
+      env:
+        CGO_ENABLED: 0
+        GOOS: ${{ matrix.os }}
+        GOARCH: ${{ matrix.arch }}
+      run: go build -v -o ${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH} .
 
-#     - name: Test
-#       run: go test -v ./...
+    - name: Rename windows executables
+      run: for f in ${EXECUTABLE_PREFIX}-windows-*; do mv "$f" "$f.exe"; done
+
+    - name: Release
+      uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            LICENSE.md
+            ${EXECUTABLE_PREFIX}*
