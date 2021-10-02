@@ -21,6 +21,7 @@ var (
 	start         = flag.String("start", "", "starting chars in address, or * for any address")
 	caseSensitive = flag.Bool("caseSensitive", true, "when true, case of wallet string must match 'start'. defaults to true")
 	concurrency   = flag.Int("concurrency", runtime.NumCPU(), "number of goroutines to use. defaults to number of cpus")
+	numResults    = flag.Int("numResults", 1, "number of results to wait for. defaults to 1")
 )
 
 func generatePair() *pair {
@@ -68,9 +69,17 @@ func main() {
 	for i := 0; i < *concurrency; i++ {
 		go findVanityAddress(*start, *caseSensitive, foundPair)
 	}
-	res := <-foundPair
 
-	fmt.Printf("Private Key:           %s\n", res.privateKey)
-	fmt.Printf("Address:               %s\n", res.address)
+	if *numResults < 1 {
+		*numResults = 1
+	}
+
+	for i := 0; i < *numResults; i++ {
+		res := <-foundPair
+
+		fmt.Printf("\n")
+		fmt.Printf("Private Key:           %s\n", res.privateKey)
+		fmt.Printf("Address:               %s\n", res.address)
+	}
 
 }
