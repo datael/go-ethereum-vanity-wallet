@@ -24,10 +24,10 @@ jobs:
       env:
         CGO_ENABLED: 0
       run: |
-        GOOS=linux GOARCH=amd64     go build -v -o bin/${EXECUTABLE_PREFIX}-linux-amd64 . && \
+        GOOS=linux GOARCH=amd64     go build -v -o bin/${EXECUTABLE_PREFIX}-linux-x64 . && \
         GOOS=linux GOARCH=arm       go build -v -o bin/${EXECUTABLE_PREFIX}-linux-arm . && \
         GOOS=linux GOARCH=arm64     go build -v -o bin/${EXECUTABLE_PREFIX}-linux-arm64 . && \
-        GOOS=windows GOARCH=amd64   go build -v -o bin/${EXECUTABLE_PREFIX}-windows-amd64.exe . && \
+        GOOS=windows GOARCH=amd64   go build -v -o bin/${EXECUTABLE_PREFIX}-windows-x64.exe . && \
         GOOS=windows GOARCH=arm     go build -v -o bin/${EXECUTABLE_PREFIX}-windows-arm.exe . && \
         GOOS=windows GOARCH=arm64   go build -v -o bin/${EXECUTABLE_PREFIX}-windows-arm64.exe .
 
