@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -30,10 +31,11 @@ func generatePair() *pair {
 	return &pair{privateKey: private, address: address}
 }
 
-func findVanityAddress(firstChars string, result chan pair) {
+func findVanityAddress(firstChars string, caseSensitive bool, result chan pair) {
 	for {
 		pair := generatePair()
-		if pair.address[2:len(firstChars)+2] == firstChars {
+		toCheck := pair.address[2 : len(firstChars)+2]
+		if (!caseSensitive && strings.EqualFold(toCheck, firstChars)) || toCheck == firstChars {
 			result <- *pair
 		}
 	}
@@ -42,6 +44,7 @@ func findVanityAddress(firstChars string, result chan pair) {
 func main() {
 
 	start := flag.String("start", "", "starting chars in address, or * for any address")
+	caseSensitive := flag.Bool("caseSensitive", true, "default true. when true, ignore case of result")
 	flag.Parse()
 
 	if len(*start) == 0 && *start != "*" {
@@ -57,9 +60,9 @@ func main() {
 
 	foundPair := make(chan pair)
 
-	concurrency := 32
+	concurrency := 15
 	for i := 0; i < concurrency; i++ {
-		go findVanityAddress(*start, foundPair)
+		go findVanityAddress(*start, *caseSensitive, foundPair)
 	}
 	res := <-foundPair
 
