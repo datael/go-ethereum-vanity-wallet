@@ -24,12 +24,12 @@ jobs:
       env:
         CGO_ENABLED: 0
       run: |
-        GOOS=linux GOARCH=amd64     go build -v -o bin/${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH} . && \
-        GOOS=linux GOARCH=arm       go build -v -o bin/${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH} . && \
-        GOOS=linux GOARCH=arm64     go build -v -o bin/${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH} . && \
-        GOOS=windows GOARCH=amd64   go build -v -o bin/${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH}.exe . && \
-        GOOS=windows GOARCH=arm     go build -v -o bin/${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH}.exe . && \
-        GOOS=windows GOARCH=arm64   go build -v -o bin/${EXECUTABLE_PREFIX}-${GOOS}-${GOARCH}.exe .
+        GOOS=linux GOARCH=amd64     go build -v -o bin/${EXECUTABLE_PREFIX}-linux-amd64 . && \
+        GOOS=linux GOARCH=arm       go build -v -o bin/${EXECUTABLE_PREFIX}-linux-arm . && \
+        GOOS=linux GOARCH=arm64     go build -v -o bin/${EXECUTABLE_PREFIX}-linux-arm64 . && \
+        GOOS=windows GOARCH=amd64   go build -v -o bin/${EXECUTABLE_PREFIX}-windows-amd64.exe . && \
+        GOOS=windows GOARCH=arm     go build -v -o bin/${EXECUTABLE_PREFIX}-windows-arm.exe . && \
+        GOOS=windows GOARCH=arm64   go build -v -o bin/${EXECUTABLE_PREFIX}-windows-arm64.exe .
 
     - name: Release
       uses: marvinpinto/action-automatic-releases@latest
