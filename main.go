@@ -52,7 +52,21 @@ func findVanityAddress(firstChars string, caseSensitive bool, result chan pair) 
 }
 
 func main() {
+	validateAndNormalizeInput()
+	welcomeLog()
 
+	foundPair := make(chan pair)
+
+	for i := 0; i < *concurrency; i++ {
+		go findVanityAddress(*start, *caseSensitive, foundPair)
+	}
+
+	for i := 0; i < *numResults; i++ {
+		logPair(<-foundPair)
+	}
+}
+
+func validateAndNormalizeInput() {
 	flag.Parse()
 
 	if len(*start) == 0 && *start != "*" {
@@ -64,6 +78,12 @@ func main() {
 		*start = ""
 	}
 
+	if *numResults < 1 {
+		*numResults = 1
+	}
+}
+
+func welcomeLog() {
 	if *verbosity >= 1 {
 		fmt.Printf("Looking for ETH wallet with address starting '0x%v'\n", *start)
 		fmt.Printf("\n")
@@ -78,31 +98,25 @@ func main() {
 		fmt.Printf("  singleLine:      %v\n", *singleLine)
 		fmt.Printf("\n")
 	}
+}
 
-	foundPair := make(chan pair)
-
-	for i := 0; i < *concurrency; i++ {
-		go findVanityAddress(*start, *caseSensitive, foundPair)
+func logPair(pair pair) {
+	if *singleLine {
+		logPairSingleLine(pair)
+	} else {
+		logPairStandard(pair)
 	}
+}
 
-	if *numResults < 1 {
-		*numResults = 1
+func logPairSingleLine(pair pair) {
+	fmt.Printf("%s %s\n", pair.address, pair.privateKey)
+}
+
+func logPairStandard(pair pair) {
+	fmt.Printf("Address:               %s\n", pair.address)
+	fmt.Printf("Private Key:           %s\n", pair.privateKey)
+
+	if *numResults > 1 {
+		fmt.Printf("\n")
 	}
-
-	for i := 0; i < *numResults; i++ {
-		res := <-foundPair
-
-		if *singleLine {
-			fmt.Printf("%s %s\n", res.address, res.privateKey)
-		} else {
-			fmt.Printf("Address:               %s\n", res.address)
-			fmt.Printf("Private Key:           %s\n", res.privateKey)
-
-			if *numResults > 1 {
-				fmt.Printf("\n")
-			}
-		}
-
-	}
-
 }
